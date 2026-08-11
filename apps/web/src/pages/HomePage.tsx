@@ -9,17 +9,29 @@ export function HomePage() {
     useCurated({ perPage: 20 });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Discover</h1>
-        <p className="text-neutral-400 mt-1">Curated photos from Pexels</p>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Hero */}
+      <div className="mb-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase tracking-wider mb-4">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+          Live from Pexels
+        </div>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-ink-900 mb-3">
+          Discover the world in{" "}
+          <span className="text-amber-500">every frame</span>
+        </h1>
+        <p className="text-ink-500 text-lg max-w-2xl">
+          AI-powered photography, sports media, and visual commerce — curated
+          for creators, agencies, and brands.
+        </p>
       </div>
 
       {isLoading && <SkeletonGrid />}
 
       {isError && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-300">
-          Failed to load photos: {error?.message}
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm">
+          <strong className="font-semibold">Failed to load photos:</strong>{" "}
+          {error?.message}
         </div>
       )}
 
@@ -46,11 +58,11 @@ export function HomePage() {
 
 function SkeletonGrid() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {Array.from({ length: 15 }).map((_, i) => (
         <div
           key={i}
-          className="aspect-square bg-neutral-900 rounded-lg animate-pulse"
+          className="aspect-square bg-cream-200 rounded-2xl animate-pulse"
         />
       ))}
     </div>

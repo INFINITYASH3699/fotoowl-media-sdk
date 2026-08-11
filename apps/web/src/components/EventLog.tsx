@@ -40,35 +40,55 @@ export function EventLog() {
     <div className="fixed bottom-4 right-4 z-30 w-80">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 flex items-center justify-between text-sm text-white hover:bg-neutral-800 transition"
+        className="w-full bg-white border border-ink-200 rounded-2xl px-4 py-3 flex items-center justify-between text-sm text-ink-900 hover:border-amber-400 shadow-card hover:shadow-card-hover transition-all group"
       >
-        <span className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          SDK Events ({logs.length})
+        <span className="flex items-center gap-2.5">
+          <span className="relative flex w-2 h-2">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+          </span>
+          <span className="font-semibold">SDK Events</span>
+          <span className="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold">
+            {logs.length}
+          </span>
         </span>
-        <span>{open ? "▼" : "▲"}</span>
+        <svg
+          className={`w-4 h-4 text-ink-400 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
       </button>
 
       {open && (
-        <div className="mt-2 bg-neutral-900 border border-neutral-800 rounded-lg max-h-80 overflow-y-auto p-2 space-y-1">
+        <div className="mt-2 bg-white border border-ink-200 rounded-2xl max-h-80 overflow-y-auto p-2 space-y-1 shadow-card-hover">
           {logs.length === 0 && (
-            <p className="text-neutral-500 text-xs p-2">
+            <p className="text-ink-400 text-xs p-3 text-center">
               No events yet. Interact with the app!
             </p>
           )}
           {logs.map((log, i) => (
             <div
               key={i}
-              className="text-xs px-2 py-1.5 rounded bg-neutral-800/50 flex items-start gap-2"
+              className="text-xs px-2.5 py-2 rounded-lg hover:bg-cream-100 flex items-start gap-2 transition-colors"
             >
               <span
-                className={`px-1.5 py-0.5 rounded font-mono text-[10px] ${colorFor(
+                className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-semibold shrink-0 ${colorFor(
                   log.type
                 )}`}
               >
                 {log.type}
               </span>
-              <span className="text-neutral-300 flex-1 break-all">
+              <span className="text-ink-700 flex-1 break-all leading-relaxed">
                 {formatPayload(log)}
               </span>
             </div>
@@ -82,13 +102,13 @@ export function EventLog() {
 function colorFor(type: LogEntry["type"]): string {
   switch (type) {
     case "view":
-      return "bg-blue-500/20 text-blue-300";
+      return "bg-blue-100 text-blue-700";
     case "download":
-      return "bg-green-500/20 text-green-300";
+      return "bg-green-100 text-green-700";
     case "search":
-      return "bg-purple-500/20 text-purple-300";
+      return "bg-amber-100 text-amber-700";
     case "error":
-      return "bg-red-500/20 text-red-300";
+      return "bg-red-100 text-red-700";
   }
 }
 
@@ -97,7 +117,9 @@ function formatPayload(log: LogEntry): string {
     case "view":
       return `${log.payload.mediaType} #${log.payload.mediaId}`;
     case "download":
-      return `${log.payload.mediaType} #${log.payload.mediaId} (${log.payload.quality ?? "?"})`;
+      return `${log.payload.mediaType} #${log.payload.mediaId} (${
+        log.payload.quality ?? "?"
+      })`;
     case "search":
       return `"${log.payload.query}" → ${log.payload.resultsCount}`;
     case "error":
