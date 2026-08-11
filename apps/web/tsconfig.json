@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "media-core": ["../../packages/media-core/dist/index.d.ts"],
+      "media-react": ["../../packages/media-react/dist/index.d.ts"],
+      "media-ui-react": ["../../packages/media-ui-react/dist/index.d.ts"]
+    }
+  },
+  "include": ["src"]
+}

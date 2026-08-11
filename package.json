@@ -1,0 +1,20 @@
+{
+  "name": "fotoowl-media-sdk",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Headless Media SDK ecosystem for FotoOwl",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm build:pkgs && pnpm build:app",
+    "build:pkgs": "pnpm --filter media-core build && pnpm --filter media-react build && pnpm --filter media-ui-react build && pnpm --filter media-native build && pnpm --filter media-ui-native build",
+    "build:app": "pnpm --filter web build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
