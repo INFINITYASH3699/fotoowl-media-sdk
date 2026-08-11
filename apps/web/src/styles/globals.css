@@ -316,3 +316,20 @@ body {
     transition: none;
   }
 }
+
+/* Keep the fixed event monitor above content without blocking the layout. */
+@media (max-width: 640px) {
+  .event-log-panel {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+}
+
+/* Respect phones with a bottom safe area. */
+@supports (padding: max(0px)) {
+  .event-log-panel {
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}

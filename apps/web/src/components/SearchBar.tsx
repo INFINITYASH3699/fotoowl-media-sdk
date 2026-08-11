@@ -17,7 +17,7 @@ export function SearchBar({
 
   // Debounce input
   useEffect(() => {
-    const t = setTimeout(() => onChange(local), 350);
+    const t = setTimeout(() => onChange(local), 600);
     return () => clearTimeout(t);
   }, [local, onChange]);
 

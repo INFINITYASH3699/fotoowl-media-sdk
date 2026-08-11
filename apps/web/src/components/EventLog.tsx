@@ -2,100 +2,115 @@ import { useState } from "react";
 import { useEvents, type SDKEventPayloads } from "media-react";
 
 type LogEntry =
-  | { type: "view"; payload: SDKEventPayloads["view"] }
-  | { type: "download"; payload: SDKEventPayloads["download"] }
-  | { type: "search"; payload: SDKEventPayloads["search"] }
-  | { type: "error"; payload: SDKEventPayloads["error"] };
+  | { id: number; type: "view"; payload: SDKEventPayloads["view"] }
+  | { id: number; type: "download"; payload: SDKEventPayloads["download"] }
+  | { id: number; type: "search"; payload: SDKEventPayloads["search"] }
+  | { id: number; type: "error"; payload: SDKEventPayloads["error"] };
 
 export function EventLog() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [open, setOpen] = useState(false);
 
-  useEvents("view", (payload) =>
-    setLogs((l) => {
-      const entry: LogEntry = { type: "view", payload };
-      return [entry, ...l].slice(0, 20);
-    })
-  );
-  useEvents("download", (payload) =>
-    setLogs((l) => {
-      const entry: LogEntry = { type: "download", payload };
-      return [entry, ...l].slice(0, 20);
-    })
-  );
-  useEvents("search", (payload) =>
-    setLogs((l) => {
-      const entry: LogEntry = { type: "search", payload };
-      return [entry, ...l].slice(0, 20);
-    })
-  );
-  useEvents("error", (payload) =>
-    setLogs((l) => {
-      const entry: LogEntry = { type: "error", payload };
-      return [entry, ...l].slice(0, 20);
-    })
-  );
+  const addLog = <T extends LogEntry["type"]>(
+    type: T,
+    payload: Extract<LogEntry, { type: T }>["payload"]
+  ) => {
+    setLogs((current) =>
+      [
+        {
+          id: Date.now() + Math.random(),
+          type,
+          payload,
+        } as LogEntry,
+        ...current,
+      ].slice(0, 20)
+    );
+  };
+
+  useEvents("view", (payload) => addLog("view", payload));
+  useEvents("download", (payload) => addLog("download", payload));
+  useEvents("search", (payload) => addLog("search", payload));
+  useEvents("error", (payload) => addLog("error", payload));
 
   return (
-    <div className="fixed bottom-4 right-4 z-30 w-80">
+    <aside
+      className={`fixed bottom-3 right-3 left-3 sm:left-auto sm:w-[360px] z-30 ${
+        open ? "max-w-[calc(100vw-1.5rem)]" : "max-w-[360px]"
+      }`}
+      aria-label="SDK event monitor"
+    >
       <button
-        onClick={() => setOpen(!open)}
-        className="w-full bg-white border border-ink-200 rounded-2xl px-4 py-3 flex items-center justify-between text-sm text-ink-900 hover:border-amber-400 shadow-card hover:shadow-card-hover transition-all group"
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className="w-full rounded-2xl border border-ink-200 bg-white/95 px-4 py-3 text-left shadow-card-hover backdrop-blur-md transition hover:border-amber-400"
       >
-        <span className="flex items-center gap-2.5">
-          <span className="relative flex w-2 h-2">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+        <span className="flex items-center justify-between gap-3">
+          <span className="flex min-w-0 items-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-70" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500" />
+            </span>
+
+            <span className="truncate font-semibold text-ink-900">
+              SDK Events
+            </span>
+
+            <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+              {logs.length}
+            </span>
           </span>
-          <span className="font-semibold">SDK Events</span>
-          <span className="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold">
-            {logs.length}
-          </span>
+
+          <svg
+            className={`h-4 w-4 shrink-0 text-ink-400 transition-transform duration-200 ${
+              open ? "rotate-180" : ""
+            }`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </span>
-        <svg
-          className={`w-4 h-4 text-ink-400 transition-transform ${
-            open ? "rotate-180" : ""
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
       </button>
 
       {open && (
-        <div className="mt-2 bg-white border border-ink-200 rounded-2xl max-h-80 overflow-y-auto p-2 space-y-1 shadow-card-hover">
-          {logs.length === 0 && (
-            <p className="text-ink-400 text-xs p-3 text-center">
-              No events yet. Interact with the app!
+        <div className="mt-2 max-h-[min(55vh,360px)] overflow-y-auto rounded-2xl border border-ink-200 bg-white/95 p-2 shadow-card-hover backdrop-blur-md">
+          {logs.length === 0 ? (
+            <p className="p-4 text-center text-xs text-ink-400">
+              No events yet. Interact with the app.
             </p>
-          )}
-          {logs.map((log, i) => (
-            <div
-              key={i}
-              className="text-xs px-2.5 py-2 rounded-lg hover:bg-cream-100 flex items-start gap-2 transition-colors"
-            >
-              <span
-                className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-semibold shrink-0 ${colorFor(
-                  log.type
-                )}`}
-              >
-                {log.type}
-              </span>
-              <span className="text-ink-700 flex-1 break-all leading-relaxed">
-                {formatPayload(log)}
-              </span>
+          ) : (
+            <div className="space-y-1">
+              {logs.map((log) => (
+                <div
+                  key={log.id}
+                  className="flex min-w-0 items-start gap-2 rounded-xl px-2.5 py-2.5 hover:bg-cream-100"
+                >
+                  <span
+                    className={`shrink-0 rounded-md px-1.5 py-1 font-mono text-[10px] font-semibold ${colorFor(
+                      log.type
+                    )}`}
+                  >
+                    {log.type}
+                  </span>
+
+                  <span className="min-w-0 flex-1 break-words text-sm leading-5 text-ink-700">
+                    {formatPayload(log)}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       )}
-    </div>
+    </aside>
   );
 }
 
@@ -121,7 +136,7 @@ function formatPayload(log: LogEntry): string {
         log.payload.quality ?? "?"
       })`;
     case "search":
-      return `"${log.payload.query}" → ${log.payload.resultsCount}`;
+      return `"${log.payload.query}" → ${log.payload.resultsCount} results`;
     case "error":
       return log.payload.message;
   }
